@@ -21,7 +21,7 @@ public class GetUrlByCodeQueryHandler : IRequestHandler<GetUrlByCodeQuery, Resul
             .FirstOrDefaultAsync(x => x.ShortCode == request.Code || x.CustomAlias == request.Code, cancellationToken);
 
         if (link == null)
-            return Result<string>.Failure("Url not found.");
+            throw new LinkForge.Application.Common.Exceptions.NotFoundException("ShortenedUrl", request.Code);
 
         return Result<string>.Success(link.OriginalUrl);
     }
