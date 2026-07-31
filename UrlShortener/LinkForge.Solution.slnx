@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Core/">
+    <Project Path="src/Core/LinkForge.Application/LinkForge.Application.csproj" />
+    <Project Path="src/Core/LinkForge.Domain/LinkForge.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Infrastructure/">
+    <Project Path="src/Infrastructure/LinkForge.Infrastructure/LinkForge.Infrastructure.csproj" />
+    <Project Path="src/Infrastructure/LinkForge.Persistence/LinkForge.Persistence.csproj" />
+  </Folder>
+  <Folder Name="/src/Presentation/">
+    <Project Path="src/Presentation/LinkForge.API/LinkForge.API.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/LinkForge.IntegrationTests/LinkForge.IntegrationTests.csproj" />
+    <Project Path="tests/LinkForge.UnitTests/LinkForge.UnitTests.csproj" />
+  </Folder>
+</Solution>
