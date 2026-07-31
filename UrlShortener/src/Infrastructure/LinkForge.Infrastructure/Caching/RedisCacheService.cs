@@ -7,10 +7,7 @@ public class RedisCacheService : ICacheService
 {
     private readonly IDatabase _cacheDb;
 
-    public RedisCacheService(IConnectionMultiplexer connectionMultiplexer)
-    {
-        _cacheDb = connectionMultiplexer.GetDatabase();
-    }
+    public RedisCacheService(IConnectionMultiplexer connectionMultiplexer) => _cacheDb = connectionMultiplexer.GetDatabase();
 
     public async Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default)
     {

@@ -13,7 +13,12 @@ public static class DependencyInjection
         
         services.AddMediatR(cfg => {
             cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
-            // TODO: Add Validation Pipeline Behavior
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(LinkForge.Application.Common.Behaviors.ValidationBehavior<,>));
+        });
+
+        services.AddAutoMapper(config => 
+        {
+            config.AddMaps(Assembly.GetExecutingAssembly());
         });
 
         return services;
