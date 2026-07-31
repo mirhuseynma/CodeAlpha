@@ -1,25 +1,22 @@
-namespace LinkForge.Persistence.Contexts;
-
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using LinkForge.Domain.Entities;
+using LinkForge.Application.Common.Interfaces;
 using System.Reflection;
 
-public class AppDbContext : DbContext, IAppDbContext
+namespace LinkForge.Persistence.Contexts;
+
+public class AppDbContext : IdentityDbContext<AppUser, Role, Guid>, IAppDbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     public DbSet<ShortenedUrl> ShortenedUrls => Set<ShortenedUrl>();
     public DbSet<UrlVisit> UrlVisits => Set<UrlVisit>();
-    public DbSet<AppUser> Users => Set<AppUser>();
-
-    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        // Add audit logic here if needed (e.g. setting CreatedAt, LastModifiedAt using TimeProvider)
-        return await base.SaveChangesAsync(cancellationToken);
-    }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         base.OnModelCreating(builder);
+        builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 }
 

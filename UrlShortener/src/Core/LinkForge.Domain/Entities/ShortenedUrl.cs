@@ -13,6 +13,6 @@ public class ShortenedUrl : BaseAuditableEntity
     public Guid? UserId { get; set; }
     public AppUser? AppUser { get; set; }
 
-    public ICollection<UrlVisit> Visits { get; set; } = new List<UrlVisit>();
+    public ICollection<UrlVisit> Visits { get; set; } = [];
 }
 
