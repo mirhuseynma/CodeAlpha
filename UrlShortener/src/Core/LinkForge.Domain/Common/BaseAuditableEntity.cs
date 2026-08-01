@@ -1,8 +1,7 @@
 namespace LinkForge.Domain.Common;
 
-public abstract class BaseAuditableEntity : IAuditableEntity
+public abstract class BaseAuditableEntity : BaseEntity, IAuditableEntity
 {
-    public Guid Id { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public Guid? CreatedBy { get; set; }
     

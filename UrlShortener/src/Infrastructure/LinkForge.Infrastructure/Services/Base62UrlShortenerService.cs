@@ -1,5 +1,3 @@
-using System.Text;
-
 namespace LinkForge.Infrastructure.Services;
 
 
@@ -7,7 +5,6 @@ namespace LinkForge.Infrastructure.Services;
 public class Base62UrlShortenerService : IUrlShorteningService
 {
     private const string Alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-    private readonly Random _random = new();
 
     public string GenerateShortCode()
     {
@@ -17,7 +14,7 @@ public class Base62UrlShortenerService : IUrlShorteningService
 
         for (var i = 0; i < length; i++)
         {
-            var index = _random.Next(Alphabet.Length);
+            var index = Random.Shared.Next(Alphabet.Length);
             sb.Append(Alphabet[index]);
         }
 

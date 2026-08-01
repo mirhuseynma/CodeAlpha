@@ -1,15 +1,18 @@
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using LinkForge.Domain.Entities;
-using LinkForge.Application.Common.Interfaces;
-using System.Reflection;
-
 namespace LinkForge.Persistence.Contexts;
 
 public class AppDbContext : IdentityDbContext<AppUser, Role, Guid>, IAppDbContext
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+    private readonly ICurrentUserService _currentUserService;
+    private readonly TimeProvider _timeProvider;
+
+    public AppDbContext(
+        DbContextOptions<AppDbContext> options,
+        ICurrentUserService currentUserService,
+        TimeProvider timeProvider) : base(options)
+    {
+        _currentUserService = currentUserService;
+        _timeProvider = timeProvider;
+    }
 
     public DbSet<ShortenedUrl> ShortenedUrls => Set<ShortenedUrl>();
     public DbSet<UrlVisit> UrlVisits => Set<UrlVisit>();
@@ -22,11 +25,8 @@ public class AppDbContext : IdentityDbContext<AppUser, Role, Guid>, IAppDbContex
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        var currentUserService = this.GetService<LinkForge.Application.Common.Interfaces.ICurrentUserService>();
-        var timeProvider = this.GetService<TimeProvider>();
-        
-        var utcNow = timeProvider.GetUtcNow().UtcDateTime;
-        var userId = currentUserService?.UserId ?? Guid.Empty; // Default system user
+        var utcNow = _timeProvider.GetUtcNow().UtcDateTime;
+        var userId = _currentUserService?.UserId ?? Guid.Empty; // Default system user
 
         foreach (var entry in ChangeTracker.Entries<LinkForge.Domain.Common.BaseAuditableEntity>())
         {

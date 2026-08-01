@@ -1,16 +1,14 @@
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using StackExchange.Redis;
-using LinkForge.Infrastructure.Caching;
-using LinkForge.Infrastructure.Services;
-using LinkForge.Infrastructure.Services.Background;
-
 namespace LinkForge.Infrastructure;
 
 public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddSingleton(TimeProvider.System);
+
+        services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
+        services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
+
         var redisConnStr = configuration.GetConnectionString("Redis") ?? throw new InvalidOperationException("Redis ConnectionString not found.");
         
         services.AddSingleton<IConnectionMultiplexer>(sp => 
@@ -21,7 +19,6 @@ public static class DependencyInjection
         
         services.AddSingleton<IUrlVisitQueue, UrlVisitQueue>();
         services.AddHostedService<UrlVisitAnalyticsWorker>();
-        services.AddHostedService<UrlVisitRecoveryHostedService>();
 
         return services;
     }

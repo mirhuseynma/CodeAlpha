@@ -1,6 +1,3 @@
-using System.Text.Json;
-using StackExchange.Redis;
-
 namespace LinkForge.Infrastructure.Caching;
 
 public class RedisCacheService : ICacheService

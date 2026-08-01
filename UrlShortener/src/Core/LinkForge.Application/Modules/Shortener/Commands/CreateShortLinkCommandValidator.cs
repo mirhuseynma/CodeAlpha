@@ -1,5 +1,3 @@
-using FluentValidation;
-
 namespace LinkForge.Application.Modules.Shortener.Commands;
 
 public class CreateShortLinkCommandValidator : AbstractValidator<CreateShortLinkCommand>

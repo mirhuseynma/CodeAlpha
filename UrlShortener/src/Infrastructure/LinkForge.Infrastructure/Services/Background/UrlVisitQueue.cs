@@ -1,7 +1,3 @@
-using System.Threading.Channels;
-using LinkForge.Application.Common.Interfaces;
-using LinkForge.Domain.Entities;
-
 namespace LinkForge.Infrastructure.Services.Background;
 
 public class UrlVisitQueue : IUrlVisitQueue
