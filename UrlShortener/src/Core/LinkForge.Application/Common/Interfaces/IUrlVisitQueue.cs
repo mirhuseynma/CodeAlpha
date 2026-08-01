@@ -1,5 +1,3 @@
-using LinkForge.Domain.Entities;
-
 namespace LinkForge.Application.Common.Interfaces;
 
 public interface IUrlVisitQueue

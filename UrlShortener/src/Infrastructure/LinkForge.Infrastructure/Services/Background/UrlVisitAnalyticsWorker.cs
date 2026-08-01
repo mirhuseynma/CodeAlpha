@@ -1,8 +1,3 @@
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using LinkForge.Application.Common.Interfaces;
-
 namespace LinkForge.Infrastructure.Services.Background;
 
 public class UrlVisitAnalyticsWorker : BackgroundService

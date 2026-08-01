@@ -1,6 +1,4 @@
-using Microsoft.AspNetCore.Identity;
-
-namespace LinkForge.Domain.Entities;
+namespace LinkForge.Persistence.Identity;
 
 public class Role : IdentityRole<Guid>
 {

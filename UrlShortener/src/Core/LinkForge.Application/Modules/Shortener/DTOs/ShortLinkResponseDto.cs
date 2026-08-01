@@ -5,5 +5,5 @@ public class ShortLinkResponseDto
     public string ShortCode { get; set; } = null!;
     public string OriginalUrl { get; set; } = null!;
     public string? CustomAlias { get; set; }
-    public DateTime CreatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
 }

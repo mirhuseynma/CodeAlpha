@@ -1,7 +1,3 @@
-using LinkForge.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
 namespace LinkForge.Persistence.Configurations;
 
 public class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
