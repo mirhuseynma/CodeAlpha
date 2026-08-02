@@ -10,6 +10,8 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IAppDbContext>(provider => provider.GetRequiredService<AppDbContext>());
+        services.AddScoped<IIdentityService, LinkForge.Persistence.Identity.IdentityService>();
+        services.AddScoped<IPermissionService, LinkForge.Persistence.Identity.PermissionService>();
 
         return services;
     }

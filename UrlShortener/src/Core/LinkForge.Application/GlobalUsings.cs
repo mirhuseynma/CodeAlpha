@@ -1,8 +1,9 @@
-
 global using AutoMapper;
 global using FluentValidation;
 global using LinkForge.Application.Common.Exceptions;
+global using LinkForge.Application.Common.Interfaces.Identity;
 global using LinkForge.Application.Common.Interfaces;
+global using LinkForge.Application.Modules.Auth.DTOs;
 global using LinkForge.Application.Modules.Shortener.DTOs;
 global using LinkForge.Domain.Common;
 global using LinkForge.Domain.Entities;

@@ -1,16 +1,25 @@
 namespace LinkForge.Application.Modules.Shortener.Queries;
 
-public class GetUrlByCodeQueryHandler : IRequestHandler<GetUrlByCodeQuery, string>
+public class GetUrlByCodeQueryHandler : IRequestHandler<GetUrlByCodeQuery, RedirectResponseDto>
 {
     private readonly IAppDbContext _context;
+    private readonly ICacheService _cacheService;
 
-    public GetUrlByCodeQueryHandler(IAppDbContext context)
+    public GetUrlByCodeQueryHandler(IAppDbContext context, ICacheService cacheService)
     {
         _context = context;
+        _cacheService = cacheService;
     }
 
-    public async Task<string> Handle(GetUrlByCodeQuery request, CancellationToken cancellationToken)
+    public async Task<RedirectResponseDto> Handle(GetUrlByCodeQuery request, CancellationToken cancellationToken)
     {
+        var cacheKey = $"UrlShortener:{request.Code}";
+        var cachedData = await _cacheService.GetAsync<RedirectResponseDto>(cacheKey, cancellationToken);
+        if (cachedData != null)
+        {
+            return cachedData;
+        }
+
         var link = await _context.ShortenedUrls
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.ShortCode == request.Code || x.CustomAlias == request.Code, cancellationToken);
@@ -18,7 +27,9 @@ public class GetUrlByCodeQueryHandler : IRequestHandler<GetUrlByCodeQuery, strin
         if (link == null)
             throw new NotFoundException("ShortenedUrl", request.Code);
 
-        return link.OriginalUrl;
+        var response = new RedirectResponseDto(link.Id, link.OriginalUrl);
+        await _cacheService.SetAsync(cacheKey, response, TimeSpan.FromHours(1), cancellationToken);
+
+        return response;
     }
 }
-

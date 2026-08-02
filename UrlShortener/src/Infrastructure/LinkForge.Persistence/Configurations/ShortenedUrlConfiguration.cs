@@ -16,6 +16,10 @@ public class ShortenedUrlConfiguration : IEntityTypeConfiguration<ShortenedUrl>
             .IsRequired()
             .HasMaxLength(15);
             
+        builder.HasIndex(x => x.CustomAlias)
+            .IsUnique()
+            .HasFilter("\"CustomAlias\" IS NOT NULL");
+            
         // Soft delete filter
         builder.HasQueryFilter(x => !x.IsDeleted);
     }

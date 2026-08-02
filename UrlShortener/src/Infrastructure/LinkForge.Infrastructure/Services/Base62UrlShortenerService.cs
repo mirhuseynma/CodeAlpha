@@ -1,7 +1,5 @@
 namespace LinkForge.Infrastructure.Services;
 
-
-
 public class Base62UrlShortenerService : IUrlShorteningService
 {
     private const string Alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";

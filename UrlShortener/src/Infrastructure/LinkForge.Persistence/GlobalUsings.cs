@@ -1,3 +1,5 @@
+global using LinkForge.Application.Common.Exceptions;
+global using LinkForge.Application.Common.Interfaces.Identity;
 global using LinkForge.Application.Common.Interfaces;
 global using LinkForge.Domain.Entities;
 global using LinkForge.Persistence.Contexts;
@@ -9,6 +11,7 @@ global using Microsoft.EntityFrameworkCore.Metadata.Builders;
 global using Microsoft.EntityFrameworkCore.Migrations;
 global using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.Caching.Memory;
 global using Microsoft.Extensions.Configuration;
 global using Microsoft.Extensions.DependencyInjection;
 global using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;

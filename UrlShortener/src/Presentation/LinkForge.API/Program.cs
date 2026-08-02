@@ -8,17 +8,14 @@ builder.Services.AddWebServices(builder.Configuration);
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+await app.InitializeDatabaseAsync();
+
+if (app.Environment.IsDevelopment()) { app.UseOpenApi(); app.UseSwaggerUi(); }
 
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
-
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 app.MapControllers();
-
 app.Run();

@@ -9,5 +9,10 @@ public class AppUser : IdentityUser<Guid>
     public DateTimeOffset? DeletedAt { get; set; }
     public Guid? DeletedBy { get; set; }
     public bool IsDeleted { get; set; }
+
+    public string FullName { get; set; } = null!;
+
+    public string? RefreshToken { get; set; }
+    public DateTimeOffset? RefreshTokenExpiryTime { get; set; }
 }
 

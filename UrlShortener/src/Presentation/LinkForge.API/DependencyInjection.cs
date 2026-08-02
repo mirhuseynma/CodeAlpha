@@ -7,6 +7,21 @@ public static class DependencyInjection
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddHttpContextAccessor();
 
+        services.AddRateLimiter(options =>
+        {
+            options.AddPolicy("IpRateLimit", httpContext =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                    _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 20,
+                        Window = TimeSpan.FromMinutes(1),
+                        QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                        QueueLimit = 0
+                    }));
+            options.RejectionStatusCode = 429;
+        });
+
         services.AddIdentity<AppUser, Role>()
             .AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders();
@@ -37,8 +52,36 @@ public static class DependencyInjection
 
         services.AddControllers();
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
+        services.AddOpenApiDocument(config =>
+        {
+            config.DocumentName = "v1";
+            config.Title = "LinkForge API";
+            config.Version = "v1";
+            config.AddSecurity("Bearer", Array.Empty<string>(), new NSwag.OpenApiSecurityScheme
+            {
+                Type = NSwag.OpenApiSecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT",
+                Description = "JWT Authorization header using the Bearer scheme."
+            });
+
+            config.OperationProcessors.Add(new NSwag.Generation.Processors.Security.AspNetCoreOperationSecurityScopeProcessor("Bearer"));
+        });
+
+        services.AddMemoryCache();
+        services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
+        services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
         return services;
+    }
+
+    public static async Task InitializeDatabaseAsync(this WebApplication app)
+    {
+        using var scope = app.Services.CreateScope();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
+        var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+        
+        await DatabaseSeeder.SeedAsync(roleManager, userManager, configuration);
     }
 }

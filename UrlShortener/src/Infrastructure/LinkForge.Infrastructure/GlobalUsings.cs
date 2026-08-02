@@ -1,5 +1,6 @@
 global using LinkForge.Application.Common.Interfaces.Identity;
 global using LinkForge.Application.Common.Interfaces;
+global using LinkForge.Application.Modules.Shortener.DTOs;
 global using LinkForge.Domain.Entities;
 global using LinkForge.Infrastructure.Caching;
 global using LinkForge.Infrastructure.Identity;
@@ -14,6 +15,7 @@ global using Microsoft.IdentityModel.Tokens;
 global using StackExchange.Redis;
 global using System.IdentityModel.Tokens.Jwt;
 global using System.Security.Claims;
+global using System.Security.Cryptography;
 global using System.Text.Json;
 global using System.Text;
 global using System.Threading.Channels;
