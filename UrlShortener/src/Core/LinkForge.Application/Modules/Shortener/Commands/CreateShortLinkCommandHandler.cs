@@ -43,9 +43,37 @@ public class CreateShortLinkCommandHandler : IRequestHandler<CreateShortLinkComm
         };
 
         _context.ShortenedUrls.Add(shortenedUrl);
-        await _context.SaveChangesAsync(cancellationToken);
 
-        return shortCode;
+        var retryCount = 0;
+        var maxRetries = 3;
+        
+        while (true)
+        {
+            try
+            {
+                await _context.SaveChangesAsync(cancellationToken);
+                break;
+            }
+            catch (DbUpdateException)
+            {
+                if (request.CustomAlias != null)
+                {
+                    throw new BadRequestException("This custom alias is already in use.");
+                }
+
+                retryCount++;
+                if (retryCount > maxRetries)
+                {
+                    throw new Exception("Could not generate a unique short code after multiple attempts.");
+                }
+
+                // Generate a new code and try again
+                shortenedUrl.ShortCode = _urlShorteningService.GenerateShortCode();
+                _context.ShortenedUrls.Update(shortenedUrl);
+            }
+        }
+
+        return shortenedUrl.ShortCode;
     }
 }
 

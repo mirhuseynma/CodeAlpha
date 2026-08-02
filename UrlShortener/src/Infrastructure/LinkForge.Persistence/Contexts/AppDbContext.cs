@@ -25,7 +25,7 @@ public class AppDbContext : IdentityDbContext<AppUser, Role, Guid>, IAppDbContex
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        var utcNow = _timeProvider.GetUtcNow().UtcDateTime;
+        var utcNow = _timeProvider.GetUtcNow();
         var userId = _currentUserService?.UserId ?? Guid.Empty; // Default system user
 
         foreach (var entry in ChangeTracker.Entries<LinkForge.Domain.Common.BaseAuditableEntity>())

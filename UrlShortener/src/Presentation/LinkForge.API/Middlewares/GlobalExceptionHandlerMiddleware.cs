@@ -17,41 +17,71 @@ public class GlobalExceptionHandlerMiddleware
         {
             await _next(context);
         }
+        catch (ValidationException ex)
+        {
+            await WriteValidationProblemAsync(context, ex);
+        }
+        catch (BadRequestException ex)
+        {
+            await WriteProblemAsync(context, ex, StatusCodes.Status400BadRequest, ex.Message);
+        }
+        catch (UnauthorizedException ex)
+        {
+            await WriteProblemAsync(context, ex, StatusCodes.Status401Unauthorized, ex.Message);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            await WriteProblemAsync(context, ex, StatusCodes.Status403Forbidden, ex.Message);
+        }
+        catch (NotFoundException ex)
+        {
+            await WriteProblemAsync(context, ex, StatusCodes.Status404NotFound, ex.Message);
+        }
+        catch (InvalidOperationException ex)
+        {
+            await WriteProblemAsync(context, ex, StatusCodes.Status409Conflict, ex.Message);
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An unhandled exception occurred.");
-            await HandleExceptionAsync(context, ex);
+            await WriteProblemAsync(context, ex, StatusCodes.Status500InternalServerError, "An unexpected error occurred while processing the request.");
         }
     }
 
-    private static Task HandleExceptionAsync(HttpContext context, Exception exception)
+    private static async Task WriteValidationProblemAsync(HttpContext context, ValidationException exception)
     {
-        context.Response.ContentType = "application/json";
-        
-        var statusCode = HttpStatusCode.InternalServerError;
-        var result = string.Empty;
+        var response = LinkForge.API.Common.Http.ProblemDetailsFactory.Create(
+            context,
+            StatusCodes.Status400BadRequest,
+            "Validation failed.",
+            exception.Errors);
 
-        switch (exception)
+        context.Response.StatusCode = StatusCodes.Status400BadRequest;
+        await context.Response.WriteAsJsonAsync(response);
+    }
+
+    private async Task WriteProblemAsync(HttpContext context, Exception exception, int statusCode, string detail)
+    {
+        if (statusCode >= StatusCodes.Status500InternalServerError)
         {
-            case ValidationException validationException:
-                statusCode = HttpStatusCode.BadRequest;
-                result = JsonSerializer.Serialize(new { error = "Validation Error", details = validationException.Errors });
-                break;
-            case BadRequestException badRequestException:
-                statusCode = HttpStatusCode.BadRequest;
-                result = JsonSerializer.Serialize(new { error = badRequestException.Message });
-                break;
-            case NotFoundException notFoundException:
-                statusCode = HttpStatusCode.NotFound;
-                result = JsonSerializer.Serialize(new { error = notFoundException.Message });
-                break;
-            default:
-                statusCode = HttpStatusCode.InternalServerError;
-                result = JsonSerializer.Serialize(new { error = "An internal server error occurred." });
-                break;
+            _logger.LogError(exception, "Server error occurred while processing the request.");
+        }
+        else
+        {
+            _logger.LogWarning(exception, "Request failed with status code {StatusCode}.", statusCode);
         }
 
-        context.Response.StatusCode = (int)statusCode;
-        return context.Response.WriteAsync(result);
+        // Assuming IHostEnvironment is not immediately available, we pass null or we can inject it.
+        // Let's pass null for environment for now since we don't have it in constructor
+        var response = LinkForge.API.Common.Http.ProblemDetailsFactory.Create(
+            context,
+            statusCode,
+            detail,
+            errors: null,
+            exception,
+            null);
+
+        context.Response.StatusCode = statusCode;
+        await context.Response.WriteAsJsonAsync(response);
     }
 }

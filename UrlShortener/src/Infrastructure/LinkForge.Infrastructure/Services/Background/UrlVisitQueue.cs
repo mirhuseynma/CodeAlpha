@@ -2,7 +2,7 @@ namespace LinkForge.Infrastructure.Services.Background;
 
 public class UrlVisitQueue : IUrlVisitQueue
 {
-    private readonly Channel<UrlVisit> _channel;
+    private readonly Channel<UrlVisitEventDto> _channel;
 
     public UrlVisitQueue()
     {
@@ -10,15 +10,15 @@ public class UrlVisitQueue : IUrlVisitQueue
         {
             FullMode = BoundedChannelFullMode.Wait
         };
-        _channel = Channel.CreateBounded<UrlVisit>(options);
+        _channel = Channel.CreateBounded<UrlVisitEventDto>(options);
     }
 
-    public async ValueTask EnqueueAsync(UrlVisit visit, CancellationToken cancellationToken = default)
+    public async ValueTask EnqueueAsync(UrlVisitEventDto visit, CancellationToken cancellationToken = default)
     {
         await _channel.Writer.WriteAsync(visit, cancellationToken);
     }
 
-    public IAsyncEnumerable<UrlVisit> DequeueAllAsync(CancellationToken cancellationToken = default)
+    public IAsyncEnumerable<UrlVisitEventDto> DequeueAllAsync(CancellationToken cancellationToken = default)
     {
         return _channel.Reader.ReadAllAsync(cancellationToken);
     }
