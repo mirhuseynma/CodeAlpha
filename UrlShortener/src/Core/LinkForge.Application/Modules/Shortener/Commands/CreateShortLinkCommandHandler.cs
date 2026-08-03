@@ -1,6 +1,6 @@
 namespace LinkForge.Application.Modules.Shortener.Commands;
 
-public class CreateShortLinkCommandHandler : IRequestHandler<CreateShortLinkCommand, string>
+public class CreateShortLinkCommandHandler : IRequestHandler<CreateShortLinkCommand, ShortLinkResponseDto>
 {
     private readonly IAppDbContext _context;
     private readonly IUrlShorteningService _urlShorteningService;
@@ -13,7 +13,7 @@ public class CreateShortLinkCommandHandler : IRequestHandler<CreateShortLinkComm
         _currentUserService = currentUserService;
     }
 
-    public async Task<string> Handle(CreateShortLinkCommand request, CancellationToken cancellationToken)
+    public async Task<ShortLinkResponseDto> Handle(CreateShortLinkCommand request, CancellationToken cancellationToken)
     {
         var shortCode = request.CustomAlias ?? _urlShorteningService.GenerateShortCode();
 
@@ -27,7 +27,6 @@ public class CreateShortLinkCommandHandler : IRequestHandler<CreateShortLinkComm
         }
         else
         {
-            // Simple loop to handle very rare collisions
             while (await _context.ShortenedUrls.AnyAsync(x => x.ShortCode == shortCode, cancellationToken))
             {
                 shortCode = _urlShorteningService.GenerateShortCode();
@@ -64,16 +63,24 @@ public class CreateShortLinkCommandHandler : IRequestHandler<CreateShortLinkComm
                 retryCount++;
                 if (retryCount > maxRetries)
                 {
-                    throw new Exception("Could not generate a unique short code after multiple attempts.");
+                    throw new BadRequestException("Could not generate a unique short code after multiple attempts.");
                 }
 
-                // Generate a new code and try again
                 shortenedUrl.ShortCode = _urlShorteningService.GenerateShortCode();
                 _context.ShortenedUrls.Update(shortenedUrl);
             }
         }
 
-        return shortenedUrl.ShortCode;
+        string shortUrl = request.BaseUrl + shortenedUrl.ShortCode;
+
+        return new ShortLinkResponseDto(
+            shortenedUrl.Id,
+            shortUrl,
+            shortenedUrl.ShortCode, 
+            shortenedUrl.OriginalUrl, 
+            shortenedUrl.CustomAlias, 
+            shortenedUrl.CreatedAt,
+            0 // TotalClicks is 0 on creation
+        );
     }
 }
-

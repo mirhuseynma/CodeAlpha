@@ -27,7 +27,7 @@ public class PermissionService : IPermissionService
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                return new HashSet<string>();
+                return [];
             }
 
             var permissions = new HashSet<string>();
@@ -51,6 +51,6 @@ public class PermissionService : IPermissionService
             }
 
             return permissions;
-        }) ?? new HashSet<string>();
+        }) ?? [];
     }
 }

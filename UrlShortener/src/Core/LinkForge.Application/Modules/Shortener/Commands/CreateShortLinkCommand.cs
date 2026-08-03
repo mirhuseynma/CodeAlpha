@@ -1,3 +1,3 @@
 namespace LinkForge.Application.Modules.Shortener.Commands;
 
-public record CreateShortLinkCommand(string OriginalUrl, string? CustomAlias) : IRequest<string>;
+public record CreateShortLinkCommand(string OriginalUrl, string? CustomAlias, string BaseUrl) : IRequest<ShortLinkResponseDto>;

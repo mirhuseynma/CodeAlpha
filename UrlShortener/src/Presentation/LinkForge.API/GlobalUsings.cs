@@ -36,4 +36,6 @@ global using System.Text.Json;
 global using System.Text;
 global using System.Threading.RateLimiting;
 global using System;
-global using NSwag.AspNetCore;  
+global using NSwag.AspNetCore;
+global using LinkForge.API.Common.Http;
+global using LinkForge.Application.Common.Pagination;
