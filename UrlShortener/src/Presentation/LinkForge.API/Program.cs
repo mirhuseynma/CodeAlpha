@@ -13,6 +13,7 @@ await app.InitializeDatabaseAsync();
 if (app.Environment.IsDevelopment()) { app.UseOpenApi(); app.UseSwaggerUi(); }
 
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+app.UseCors("AllowAll");
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

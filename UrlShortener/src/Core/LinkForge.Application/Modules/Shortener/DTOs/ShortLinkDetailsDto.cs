@@ -1,11 +1,12 @@
 namespace LinkForge.Application.Modules.Shortener.DTOs;
 
-public record ShortLinkResponseDto(
+public record ShortLinkDetailsDto(
     Guid Id,
     string ShortUrl,
     string ShortCode, 
     string OriginalUrl, 
     string? CustomAlias, 
     DateTimeOffset CreatedAt,
-    int TotalClicks
+    int TotalClicks,
+    List<UrlVisitDto> RecentVisits
 );

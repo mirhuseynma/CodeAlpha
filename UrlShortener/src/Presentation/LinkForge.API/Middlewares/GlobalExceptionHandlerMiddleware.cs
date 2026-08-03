@@ -1,3 +1,4 @@
+
 namespace LinkForge.API.Middlewares;
 
 public class GlobalExceptionHandlerMiddleware
@@ -50,7 +51,7 @@ public class GlobalExceptionHandlerMiddleware
 
     private static async Task WriteValidationProblemAsync(HttpContext context, ValidationException exception)
     {
-        var response = LinkForge.API.Common.Http.ProblemDetailsFactory.Create(
+        var response = ProblemDetailsFactory.Create(
             context,
             StatusCodes.Status400BadRequest,
             "Validation failed.",

@@ -24,4 +24,6 @@ public class CurrentUserService : ICurrentUserService
             return null;
         }
     }
+
+    public bool IsAdmin => _httpContextAccessor.HttpContext?.User?.IsInRole("Admin") ?? false;
 }
