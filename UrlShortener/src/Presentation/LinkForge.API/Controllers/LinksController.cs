@@ -36,6 +36,15 @@ public class LinksController : ApiControllerBase
         return Ok(result);
     }
 
+    [HttpGet("stats")]
+    public async Task<IActionResult> GetStats(CancellationToken cancellationToken = default)
+    {
+        var query = new GetUserStatsQuery();
+        var result = await _mediator.Send(query, cancellationToken);
+        
+        return Ok(result);
+    }
+
     [HttpGet("{code}")]
     public async Task<IActionResult> GetByCode(string code, CancellationToken cancellationToken)
     {
