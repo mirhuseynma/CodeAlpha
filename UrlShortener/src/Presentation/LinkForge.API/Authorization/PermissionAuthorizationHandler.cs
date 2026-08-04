@@ -11,7 +11,8 @@ public class PermissionAuthorizationHandler : AuthorizationHandler<PermissionReq
 
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, PermissionRequirement requirement)
     {
-        var userId = context.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        var userId = context.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value 
+            ?? context.User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
 
         if (string.IsNullOrEmpty(userId))
         {

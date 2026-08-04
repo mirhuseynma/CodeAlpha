@@ -77,10 +77,10 @@ public class IdentityService : IIdentityService
             return null;
         }
 
-        if (!await _userManager.IsEmailConfirmedAsync(user))
-        {
-            throw new BadRequestException("Email is not confirmed.");
-        }
+        // if (!await _userManager.IsEmailConfirmedAsync(user))
+        // {
+        //     throw new BadRequestException("Email is not confirmed.");
+        // }
 
         var roles = await _userManager.GetRolesAsync(user);
 
