@@ -7,6 +7,7 @@ import './index.css'
 
 import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
+import AdminDashboard from './pages/AdminDashboard'
 import Login from './pages/Login'
 import Register from './pages/Register'
 
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
   {
     path: '/register',
     element: <Register />,
+  },
+  {
+    path: '/admin',
+    element: <AdminDashboard />,
   }
 ]);
 

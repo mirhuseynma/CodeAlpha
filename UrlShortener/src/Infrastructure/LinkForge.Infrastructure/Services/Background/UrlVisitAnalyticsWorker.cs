@@ -1,3 +1,6 @@
+using System.Net.Http;
+using System.Net.Http.Json;
+
 namespace LinkForge.Infrastructure.Services.Background;
 
 public class UrlVisitAnalyticsWorker : BackgroundService
@@ -5,12 +8,18 @@ public class UrlVisitAnalyticsWorker : BackgroundService
     private readonly IUrlVisitQueue _queue;
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger<UrlVisitAnalyticsWorker> _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
 
-    public UrlVisitAnalyticsWorker(IUrlVisitQueue queue, IServiceScopeFactory scopeFactory, ILogger<UrlVisitAnalyticsWorker> logger)
+    public UrlVisitAnalyticsWorker(
+        IUrlVisitQueue queue, 
+        IServiceScopeFactory scopeFactory, 
+        ILogger<UrlVisitAnalyticsWorker> logger,
+        IHttpClientFactory httpClientFactory)
     {
         _queue = queue;
         _scopeFactory = scopeFactory;
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -51,13 +60,35 @@ public class UrlVisitAnalyticsWorker : BackgroundService
                     using var scope = _scopeFactory.CreateScope();
                     var dbContext = scope.ServiceProvider.GetRequiredService<IAppDbContext>();
                     
-                    var entities = batch.Select(dto => new UrlVisit
+                    var entities = new List<UrlVisit>();
+                    using var httpClient = _httpClientFactory.CreateClient();
+
+                    foreach (var dto in batch)
                     {
-                        ShortenedUrlId = dto.ShortenedUrlId,
-                        IpAddress = dto.IpAddress,
-                        UserAgent = dto.UserAgent,
-                        Referer = dto.Referer
-                    });
+                        string? country = null;
+                        
+                        if (!string.IsNullOrEmpty(dto.IpAddress) && dto.IpAddress != "unknown" && dto.IpAddress != "::1" && dto.IpAddress != "127.0.0.1")
+                        {
+                            try
+                            {
+                                var geoResponse = await httpClient.GetFromJsonAsync<GeoIpResponse>($"http://ip-api.com/json/{dto.IpAddress}", stoppingToken);
+                                country = geoResponse?.Country;
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogWarning(ex, "Failed to resolve GeoIP for {IpAddress}", dto.IpAddress);
+                            }
+                        }
+
+                        entities.Add(new UrlVisit
+                        {
+                            ShortenedUrlId = dto.ShortenedUrlId,
+                            IpAddress = dto.IpAddress,
+                            UserAgent = dto.UserAgent,
+                            Referer = dto.Referer,
+                            Country = country ?? "Unknown"
+                        });
+                    }
 
                     dbContext.UrlVisits.AddRange(entities);
                     await dbContext.SaveChangesAsync(stoppingToken);
@@ -71,6 +102,11 @@ public class UrlVisitAnalyticsWorker : BackgroundService
                 }
             }
         }
+    }
+
+    private class GeoIpResponse
+    {
+        public string? Country { get; set; }
     }
 }
 

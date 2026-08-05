@@ -7,5 +7,6 @@ public record ShortLinkResponseDto(
     string OriginalUrl, 
     string? CustomAlias, 
     DateTimeOffset CreatedAt,
-    int TotalClicks
+    int TotalClicks,
+    bool IsActive
 );

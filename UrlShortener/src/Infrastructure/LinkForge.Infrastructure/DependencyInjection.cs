@@ -19,6 +19,7 @@ public static class DependencyInjection
         
         services.AddSingleton<IUrlVisitQueue, UrlVisitQueue>();
         services.AddHostedService<UrlVisitAnalyticsWorker>();
+        services.AddHttpClient();
 
         return services;
     }

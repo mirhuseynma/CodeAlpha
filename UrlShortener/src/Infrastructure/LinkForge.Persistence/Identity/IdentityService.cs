@@ -1,3 +1,7 @@
+using LinkForge.Application.Common.Interfaces.Identity;
+using LinkForge.Application.Modules.Admin.DTOs;
+using Microsoft.EntityFrameworkCore;
+
 namespace LinkForge.Persistence.Identity;
 
 public class IdentityService : IIdentityService
@@ -129,5 +133,24 @@ public class IdentityService : IIdentityService
         await _userManager.UpdateAsync(user);
 
         return (newAccessToken, newRefreshToken);
+    }
+
+    public async Task<int> GetTotalUsersAsync()
+    {
+        return await _userManager.Users.CountAsync();
+    }
+
+    public async Task<IEnumerable<AdminUserDto>> GetAllUsersAsync()
+    {
+        return await _userManager.Users
+            .OrderByDescending(u => u.CreatedAt)
+            .Select(u => new AdminUserDto(
+                u.Id,
+                u.FullName,
+                "", // LastName if you want to split FullName, or just leave empty
+                u.Email ?? "",
+                0, // LinksCount can be populated later or we leave it 0
+                u.CreatedAt
+            )).ToListAsync();
     }
 }

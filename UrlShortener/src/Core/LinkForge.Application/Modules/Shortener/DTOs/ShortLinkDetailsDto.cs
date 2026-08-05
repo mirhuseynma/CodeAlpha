@@ -8,5 +8,6 @@ public record ShortLinkDetailsDto(
     string? CustomAlias, 
     DateTimeOffset CreatedAt,
     int TotalClicks,
-    List<UrlVisitDto> RecentVisits
+    List<UrlVisitDto> RecentVisits,
+    bool IsActive
 );

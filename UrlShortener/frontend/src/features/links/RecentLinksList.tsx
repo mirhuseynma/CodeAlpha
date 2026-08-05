@@ -1,8 +1,9 @@
-import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import { Copy, ExternalLink, Activity, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+import { Copy, ExternalLink, Activity, ChevronLeft, ChevronRight, Trash2, Power, BarChart2 } from 'lucide-react';
 import api from '../../services/api';
 import type { ShortLinkResponse } from './CreateLinkForm';
 import { useState } from 'react';
+import AnalyticsModal from './AnalyticsModal';
 
 interface PagedResult<T> {
   items: T[];
@@ -10,12 +11,16 @@ interface PagedResult<T> {
   pageSize: number;
   totalCount: number;
   totalPages: number;
+  hasNextPage: boolean;
 }
 
 const RecentLinksList = () => {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const pageSize = 5; // Reduced back to 5 so pagination is visible
+  
+  const [analyticsLink, setAnalyticsLink] = useState<{id: string, url: string} | null>(null);
+  const queryClient = useQueryClient();
 
   const { data, isLoading, isError, isFetching } = useQuery({
     queryKey: ['links', page],
@@ -24,6 +29,24 @@ const RecentLinksList = () => {
       return response.data;
     },
     placeholderData: keepPreviousData,
+  });
+
+  const toggleStatusMutation = useMutation({
+    mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
+      await api.patch(`/links/${id}/status`, { isActive });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['links'] });
+    }
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await api.delete(`/links/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['links'] });
+    }
   });
 
   const handleCopy = async (id: string, url: string) => {
@@ -82,12 +105,25 @@ const RecentLinksList = () => {
           </div>
 
           <div className="flex items-center gap-3">
+            {!link.isActive && (
+               <span className="text-xs font-semibold px-2 py-1 bg-amber-500/10 text-amber-500 rounded-md border border-amber-500/20 mr-2">
+                 Inactive
+               </span>
+            )}
             <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-800/80 rounded-md border border-slate-700/50" title="Total Clicks">
               <Activity size={14} className="text-cyan-400" />
               <span className="text-sm font-medium text-slate-300">{link.totalClicks}</span>
             </div>
             
             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button
+                onClick={() => setAnalyticsLink({ id: link.id, url: link.shortUrl })}
+                className="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-emerald-600 rounded-lg transition-colors"
+                title="View Analytics"
+              >
+                <BarChart2 size={16} />
+              </button>
+              
               <button
                 onClick={() => handleCopy(link.id, link.shortUrl)}
                 className="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-indigo-600 rounded-lg transition-colors"
@@ -104,6 +140,30 @@ const RecentLinksList = () => {
               >
                 <ExternalLink size={16} />
               </a>
+              
+              <div className="w-px h-6 bg-slate-700 mx-1"></div>
+              
+              <button
+                onClick={() => toggleStatusMutation.mutate({ id: link.id, isActive: !link.isActive })}
+                disabled={toggleStatusMutation.isPending}
+                className={`p-2 rounded-lg transition-colors ${link.isActive ? 'text-slate-400 hover:text-white bg-slate-800 hover:bg-amber-600' : 'text-amber-500 bg-amber-500/10 hover:bg-amber-500 hover:text-white'}`}
+                title={link.isActive ? "Deactivate link" : "Activate link"}
+              >
+                <Power size={16} />
+              </button>
+              
+              <button
+                onClick={() => {
+                  if(window.confirm('Are you sure you want to delete this link?')) {
+                    deleteMutation.mutate(link.id);
+                  }
+                }}
+                disabled={deleteMutation.isPending}
+                className="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-rose-600 rounded-lg transition-colors"
+                title="Delete link"
+              >
+                <Trash2 size={16} />
+              </button>
             </div>
           </div>
           
@@ -133,6 +193,16 @@ const RecentLinksList = () => {
             </button>
           </div>
         </div>
+      )}
+      
+      {/* Analytics Modal */}
+      {analyticsLink && (
+        <AnalyticsModal 
+          isOpen={!!analyticsLink}
+          onClose={() => setAnalyticsLink(null)}
+          linkId={analyticsLink.id}
+          shortUrl={analyticsLink.url}
+        />
       )}
     </div>
   );
