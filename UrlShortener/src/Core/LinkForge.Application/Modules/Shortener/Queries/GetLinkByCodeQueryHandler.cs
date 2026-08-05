@@ -44,7 +44,8 @@ public class GetLinkByCodeQueryHandler : IRequestHandler<GetLinkByCodeQuery, Sho
             link.CreatedAt,
             link.Visits.Count,
             recentVisits,
-            link.IsActive
+            link.IsActive,
+            link.ExpiresAt
         );
     }
 }

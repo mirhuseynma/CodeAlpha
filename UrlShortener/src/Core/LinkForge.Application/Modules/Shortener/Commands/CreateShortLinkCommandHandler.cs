@@ -38,7 +38,8 @@ public class CreateShortLinkCommandHandler : IRequestHandler<CreateShortLinkComm
             OriginalUrl = request.OriginalUrl,
             ShortCode = shortCode,
             CustomAlias = request.CustomAlias,
-            UserId = _currentUserService.UserId
+            UserId = _currentUserService.UserId,
+            ExpiresAt = request.ExpiresAt
         };
 
         _context.ShortenedUrls.Add(shortenedUrl);
@@ -81,7 +82,8 @@ public class CreateShortLinkCommandHandler : IRequestHandler<CreateShortLinkComm
             shortenedUrl.CustomAlias, 
             shortenedUrl.CreatedAt,
             0, // TotalClicks is 0 on creation
-            true // IsActive is true by default
+            true, // IsActive is true by default
+            shortenedUrl.ExpiresAt
         );
     }
 }

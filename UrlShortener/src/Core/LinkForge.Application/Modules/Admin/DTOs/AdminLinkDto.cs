@@ -11,5 +11,6 @@ public record AdminLinkDto(
     bool IsActive,
     bool IsDeleted,
     DateTimeOffset CreatedAt,
-    string? UserEmail
+    string? UserEmail,
+    DateTimeOffset? ExpiresAt
 );

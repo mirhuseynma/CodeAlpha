@@ -30,6 +30,9 @@ public class GetUrlByCodeQueryHandler : IRequestHandler<GetUrlByCodeQuery, Redir
         if (!link.IsActive)
             throw new BadRequestException("This link has been deactivated.");
 
+        if (link.ExpiresAt.HasValue && link.ExpiresAt.Value < DateTimeOffset.UtcNow)
+            throw new BadRequestException("This link has expired.");
+
         var response = new RedirectResponseDto(link.Id, link.OriginalUrl);
         await _cacheService.SetAsync(cacheKey, response, TimeSpan.FromHours(1), cancellationToken);
 

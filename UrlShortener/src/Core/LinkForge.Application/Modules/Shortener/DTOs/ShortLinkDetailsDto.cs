@@ -9,5 +9,6 @@ public record ShortLinkDetailsDto(
     DateTimeOffset CreatedAt,
     int TotalClicks,
     List<UrlVisitDto> RecentVisits,
-    bool IsActive
+    bool IsActive,
+    DateTimeOffset? ExpiresAt
 );

@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+import { ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
 import api from '../../services/api';
 
 interface AdminUserDto {
@@ -24,6 +24,7 @@ interface PagedResult<T> {
 const AdminUsersTable = () => {
   const [page, setPage] = useState(1);
   const pageSize = 10;
+  const queryClient = useQueryClient();
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: ['adminUsers', page],
@@ -32,6 +33,15 @@ const AdminUsersTable = () => {
       return response.data;
     },
     placeholderData: keepPreviousData,
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await api.delete(`/admin/users/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminUsers'] });
+    }
   });
 
   if (isLoading) {
@@ -47,6 +57,7 @@ const AdminUsersTable = () => {
               <th className="px-6 py-4">Name</th>
               <th className="px-6 py-4">Email</th>
               <th className="px-6 py-4">Joined At</th>
+              <th className="px-6 py-4 text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800">
@@ -55,11 +66,25 @@ const AdminUsersTable = () => {
                 <td className="px-6 py-4 font-medium text-white">{user.firstName} {user.lastName}</td>
                 <td className="px-6 py-4">{user.email}</td>
                 <td className="px-6 py-4">{new Date(user.createdAt).toLocaleDateString()}</td>
+                <td className="px-6 py-4 text-right">
+                  <button
+                    onClick={() => {
+                      if(window.confirm('Are you sure you want to permanently delete this user and all their links?')) {
+                        deleteMutation.mutate(user.id);
+                      }
+                    }}
+                    disabled={deleteMutation.isPending}
+                    className="p-1.5 text-slate-400 hover:text-white bg-slate-800 hover:bg-red-600 rounded transition-colors"
+                    title="Delete User"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </td>
               </tr>
             ))}
             {data?.items.length === 0 && (
               <tr>
-                <td colSpan={3} className="px-6 py-8 text-center text-slate-500">No users found.</td>
+                <td colSpan={4} className="px-6 py-8 text-center text-slate-500">No users found.</td>
               </tr>
             )}
           </tbody>

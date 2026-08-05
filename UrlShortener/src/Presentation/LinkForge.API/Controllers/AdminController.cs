@@ -46,4 +46,11 @@ public class AdminController : ControllerBase
         await _mediator.Send(new HardDeleteShortLinkCommand(id), cancellationToken);
         return NoContent();
     }
+
+    [HttpDelete("users/{id}")]
+    public async Task<IActionResult> HardDeleteUser(Guid id, CancellationToken cancellationToken)
+    {
+        await _mediator.Send(new LinkForge.Application.Modules.Admin.Commands.HardDeleteUserCommand(id), cancellationToken);
+        return NoContent();
+    }
 }

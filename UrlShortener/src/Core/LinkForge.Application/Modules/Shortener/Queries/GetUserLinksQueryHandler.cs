@@ -30,7 +30,8 @@ public class GetUserLinksQueryHandler : IRequestHandler<GetUserLinksQuery, Paged
                 x.CustomAlias, 
                 x.CreatedAt,
                 x.Visits.Count(),
-                x.IsActive
+                x.IsActive,
+                x.ExpiresAt
             ));
 
         return await PagedResult<ShortLinkResponseDto>.CreateAsync(query, request.PageNumber, request.PageSize, cancellationToken);

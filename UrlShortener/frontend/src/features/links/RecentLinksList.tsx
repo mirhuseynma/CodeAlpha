@@ -105,7 +105,11 @@ const RecentLinksList = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            {!link.isActive && (
+            {link.expiresAt && new Date(link.expiresAt) < new Date() ? (
+               <span className="text-xs font-semibold px-2 py-1 bg-red-500/10 text-red-500 rounded-md border border-red-500/20 mr-2">
+                 Expired
+               </span>
+            ) : !link.isActive && (
                <span className="text-xs font-semibold px-2 py-1 bg-amber-500/10 text-amber-500 rounded-md border border-amber-500/20 mr-2">
                  Inactive
                </span>

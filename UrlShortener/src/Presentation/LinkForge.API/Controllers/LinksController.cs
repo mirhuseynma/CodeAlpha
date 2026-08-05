@@ -21,7 +21,7 @@ public class LinksController : ApiControllerBase
     [EnableRateLimiting("IpRateLimit")]
     public async Task<IActionResult> Create([FromBody] CreateShortLinkRequestDto request, CancellationToken cancellationToken)
     {
-        var command = new CreateShortLinkCommand(request.OriginalUrl, request.CustomAlias, GetBaseUrl());
+        var command = new CreateShortLinkCommand(request.OriginalUrl, request.CustomAlias, GetBaseUrl(), request.ExpiresAt);
         var result = await _mediator.Send(command, cancellationToken);
         
         return StatusCode(StatusCodes.Status201Created, result);

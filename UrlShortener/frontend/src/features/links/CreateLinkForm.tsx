@@ -17,6 +17,7 @@ export interface ShortLinkResponse {
   createdAt: string;
   totalClicks: number;
   isActive: boolean;
+  expiresAt?: string;
 }
 
 const CreateLinkForm = () => {
@@ -43,7 +44,27 @@ const CreateLinkForm = () => {
   });
 
   const onSubmit = (data: CreateLinkFormData) => {
-    mutation.mutate(data);
+    let formattedExpiresAt = undefined;
+    if (data.expiresAt) {
+      const date = new Date(data.expiresAt);
+      const tzo = -date.getTimezoneOffset();
+      const dif = tzo >= 0 ? '+' : '-';
+      const pad = (num: number) => (num < 10 ? '0' : '') + num;
+      formattedExpiresAt = date.getFullYear() +
+        '-' + pad(date.getMonth() + 1) +
+        '-' + pad(date.getDate()) +
+        'T' + pad(date.getHours()) +
+        ':' + pad(date.getMinutes()) +
+        ':' + pad(date.getSeconds()) +
+        dif + pad(Math.floor(Math.abs(tzo) / 60)) +
+        ':' + pad(Math.abs(tzo) % 60);
+    }
+
+    const payload = {
+      ...data,
+      expiresAt: formattedExpiresAt,
+    };
+    mutation.mutate(payload as CreateLinkFormData);
   };
 
   return (
@@ -75,6 +96,14 @@ const CreateLinkForm = () => {
               placeholder="Custom alias (optional)"
               {...register('customAlias')}
               error={errors.customAlias?.message}
+            />
+          </div>
+          <div className="flex-1">
+            <Input
+              type="datetime-local"
+              placeholder="Expiration Date (optional)"
+              {...register('expiresAt')}
+              error={errors.expiresAt?.message}
             />
           </div>
           <Button 
