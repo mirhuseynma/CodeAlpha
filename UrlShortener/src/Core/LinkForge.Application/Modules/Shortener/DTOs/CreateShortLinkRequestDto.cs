@@ -1,3 +1,3 @@
 namespace LinkForge.Application.Modules.Shortener.DTOs;
 
-public record CreateShortLinkRequestDto(string OriginalUrl, string? CustomAlias);
+public record CreateShortLinkRequestDto(string OriginalUrl, string? CustomAlias, DateTimeOffset? ExpiresAt);

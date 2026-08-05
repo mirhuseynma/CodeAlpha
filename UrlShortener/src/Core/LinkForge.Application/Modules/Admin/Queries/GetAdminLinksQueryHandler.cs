@@ -39,7 +39,8 @@ public class GetAdminLinksQueryHandler : IRequestHandler<GetAdminLinksQuery, Pag
                 link.IsActive,
                 link.IsDeleted,
                 link.CreatedAt,
-                link.UserId.ToString() // We will return UserId here temporarily
+                link.UserId.ToString(), // We will return UserId here temporarily
+                link.ExpiresAt
             ))
             .ToListAsync(cancellationToken);
 

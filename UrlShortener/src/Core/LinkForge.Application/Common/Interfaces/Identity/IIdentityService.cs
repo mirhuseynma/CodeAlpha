@@ -14,4 +14,5 @@ public interface IIdentityService
     Task<(string Token, string RefreshToken)?> RefreshTokensAsync(string email, string refreshToken);
     Task<IEnumerable<AdminUserDto>> GetAllUsersAsync();
     Task<int> GetTotalUsersAsync();
+    Task<bool> DeleteUserAsync(Guid userId);
 }

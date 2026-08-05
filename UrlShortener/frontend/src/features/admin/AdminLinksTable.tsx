@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
-import { ChevronLeft, ChevronRight, Trash2, Power, ExternalLink } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Trash2, Power, ExternalLink, BarChart2 } from 'lucide-react';
 import api, { API_BASE_URL } from '../../services/api';
+import AnalyticsModal from '../links/AnalyticsModal';
 
 interface AdminLinkDto {
   id: string;
@@ -13,6 +14,7 @@ interface AdminLinkDto {
   isDeleted: boolean;
   createdAt: string;
   userEmail?: string;
+  expiresAt?: string;
 }
 
 interface PagedResult<T> {
@@ -28,6 +30,7 @@ const AdminLinksTable = () => {
   const [page, setPage] = useState(1);
   const pageSize = 10;
   const queryClient = useQueryClient();
+  const [analyticsLink, setAnalyticsLink] = useState<{id: string, url: string} | null>(null);
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: ['adminLinks', page],
@@ -93,9 +96,11 @@ const AdminLinksTable = () => {
                 </td>
                 <td className="px-4 py-4">{link.visitsCount}</td>
                 <td className="px-4 py-4">
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     {link.isDeleted ? (
                        <span className="px-2 py-1 text-xs rounded bg-red-500/10 text-red-500 border border-red-500/20">Deleted</span>
+                    ) : link.expiresAt && new Date(link.expiresAt) < new Date() ? (
+                       <span className="px-2 py-1 text-xs rounded bg-red-500/10 text-red-500 border border-red-500/20">Expired</span>
                     ) : (
                        <span className={`px-2 py-1 text-xs rounded border ${link.isActive ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-amber-500/10 text-amber-500 border-amber-500/20'}`}>
                          {link.isActive ? 'Active' : 'Inactive'}
@@ -105,6 +110,13 @@ const AdminLinksTable = () => {
                 </td>
                 <td className="px-4 py-4 text-right">
                   <div className="flex items-center justify-end gap-2">
+                    <button
+                      onClick={() => setAnalyticsLink({ id: link.id, url: baseUrl + link.shortCode })}
+                      className="p-1.5 text-slate-400 hover:text-white bg-slate-800 hover:bg-emerald-600 rounded transition-colors"
+                      title="View Analytics"
+                    >
+                      <BarChart2 size={14} />
+                    </button>
                     {!link.isDeleted && (
                       <button
                         onClick={() => toggleStatusMutation.mutate({ id: link.id, isActive: !link.isActive })}
@@ -162,6 +174,16 @@ const AdminLinksTable = () => {
             </button>
           </div>
         </div>
+      )}
+
+      {/* Analytics Modal */}
+      {analyticsLink && (
+        <AnalyticsModal 
+          isOpen={!!analyticsLink}
+          onClose={() => setAnalyticsLink(null)}
+          linkId={analyticsLink.id}
+          shortUrl={analyticsLink.url}
+        />
       )}
     </div>
   );

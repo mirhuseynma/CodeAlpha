@@ -43,15 +43,15 @@ const AnalyticsModal: React.FC<AnalyticsModalProps> = ({ isOpen, onClose, linkId
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-slate-950/80 backdrop-blur-md"
         onClick={onClose}
       />
       
       {/* Modal */}
-      <div className="relative bg-slate-900 border border-slate-800 w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+      <div className="relative bg-slate-900 border border-slate-700/50 w-full max-w-5xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-slate-800">
@@ -89,45 +89,47 @@ const AnalyticsModal: React.FC<AnalyticsModalProps> = ({ isOpen, onClose, linkId
                 </span>
               </div>
               
-              <div className="border border-slate-800 rounded-xl overflow-hidden">
-                <table className="w-full text-left text-sm text-slate-400">
-                  <thead className="text-xs text-slate-500 uppercase bg-slate-900/50 border-b border-slate-800">
-                    <tr>
-                      <th className="px-4 py-3">Time</th>
-                      <th className="px-4 py-3">Location (IP)</th>
-                      <th className="px-4 py-3">Device / Browser</th>
-                      <th className="px-4 py-3">Referer</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-800">
-                    {data?.items.map((visit, idx) => (
-                      <tr key={idx} className="hover:bg-slate-800/50 transition-colors">
-                        <td className="px-4 py-3 whitespace-nowrap">
-                          <div className="flex items-center gap-2">
-                            <Clock size={14} className="text-slate-500" />
-                            <span>{new Date(visit.visitedAt).toLocaleString()}</span>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-2">
-                            <MapPin size={14} className="text-rose-400" />
-                            <span>{visit.country || 'Unknown'}</span>
-                            <span className="text-xs text-slate-600 ml-1">({visit.ipAddress || 'Unknown IP'})</span>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-2">
-                            <Monitor size={14} className="text-indigo-400" />
-                            <span className="truncate max-w-[200px]" title={visit.userAgent}>{visit.userAgent || 'Unknown'}</span>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 truncate max-w-[150px]" title={visit.referer}>
-                          {visit.referer || '-'}
-                        </td>
+              <div className="border border-slate-700/50 rounded-xl overflow-hidden shadow-inner bg-slate-900/50">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm text-slate-300">
+                    <thead className="text-xs text-slate-400 uppercase bg-slate-800/80 border-b border-slate-700/50">
+                      <tr>
+                        <th className="px-6 py-4 font-semibold tracking-wider">Time</th>
+                        <th className="px-6 py-4 font-semibold tracking-wider">Location (IP)</th>
+                        <th className="px-6 py-4 font-semibold tracking-wider">Device / Browser</th>
+                        <th className="px-6 py-4 font-semibold tracking-wider">Referer</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/80">
+                      {data?.items.map((visit, idx) => (
+                        <tr key={idx} className="hover:bg-slate-800/40 transition-colors">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center gap-2">
+                              <Clock size={16} className="text-slate-400" />
+                              <span className="font-medium text-slate-200">{new Date(visit.visitedAt).toLocaleString()}</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-2">
+                              <MapPin size={16} className="text-rose-400" />
+                              <span className="font-medium">{visit.country || 'Unknown'}</span>
+                              <span className="text-xs text-slate-500 ml-1">({visit.ipAddress || 'Unknown IP'})</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-2">
+                              <Monitor size={16} className="text-indigo-400" />
+                              <span className="truncate max-w-[250px]" title={visit.userAgent || 'Unknown'}>{visit.userAgent || 'Unknown'}</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 truncate max-w-[200px] text-slate-400" title={visit.referer || '-'}>
+                            {visit.referer || '-'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
 
               {/* Pagination */}
