@@ -16,6 +16,7 @@ export interface ShortLinkResponse {
   customAlias?: string;
   createdAt: string;
   totalClicks: number;
+  isActive: boolean;
 }
 
 const CreateLinkForm = () => {

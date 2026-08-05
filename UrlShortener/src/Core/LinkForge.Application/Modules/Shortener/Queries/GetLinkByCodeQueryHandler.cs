@@ -43,7 +43,8 @@ public class GetLinkByCodeQueryHandler : IRequestHandler<GetLinkByCodeQuery, Sho
             link.CustomAlias, 
             link.CreatedAt,
             link.Visits.Count,
-            recentVisits
+            recentVisits,
+            link.IsActive
         );
     }
 }

@@ -1,3 +1,5 @@
+using LinkForge.Application.Modules.Admin.DTOs;
+
 namespace LinkForge.Application.Common.Interfaces.Identity;
 
 public interface IIdentityService
@@ -10,4 +12,6 @@ public interface IIdentityService
     Task<(string Token, string RefreshToken)?> LoginAsync(string email, string password);
     Task<(string Token, string RefreshToken)> GenerateTokensAsync(string email);
     Task<(string Token, string RefreshToken)?> RefreshTokensAsync(string email, string refreshToken);
+    Task<IEnumerable<AdminUserDto>> GetAllUsersAsync();
+    Task<int> GetTotalUsersAsync();
 }

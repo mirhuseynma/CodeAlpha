@@ -24,8 +24,11 @@ public class GetUrlByCodeQueryHandler : IRequestHandler<GetUrlByCodeQuery, Redir
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.ShortCode == request.Code || x.CustomAlias == request.Code, cancellationToken);
 
-        if (link == null)
+        if (link == null || link.IsDeleted)
             throw new NotFoundException("ShortenedUrl", request.Code);
+            
+        if (!link.IsActive)
+            throw new BadRequestException("This link has been deactivated.");
 
         var response = new RedirectResponseDto(link.Id, link.OriginalUrl);
         await _cacheService.SetAsync(cacheKey, response, TimeSpan.FromHours(1), cancellationToken);

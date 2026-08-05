@@ -80,7 +80,8 @@ public class CreateShortLinkCommandHandler : IRequestHandler<CreateShortLinkComm
             shortenedUrl.OriginalUrl, 
             shortenedUrl.CustomAlias, 
             shortenedUrl.CreatedAt,
-            0 // TotalClicks is 0 on creation
+            0, // TotalClicks is 0 on creation
+            true // IsActive is true by default
         );
     }
 }

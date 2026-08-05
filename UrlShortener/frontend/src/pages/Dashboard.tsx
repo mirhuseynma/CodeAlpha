@@ -5,7 +5,7 @@ import RecentLinksList from '../features/links/RecentLinksList';
 import QuickStats from '../features/links/QuickStats';
 
 const Dashboard = () => {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, isAdmin, logout } = useAuth();
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -22,12 +22,22 @@ const Dashboard = () => {
           <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-cyan-400">
             LinkForge Dashboard
           </h1>
-          <button 
-            onClick={logout}
-            className="px-4 py-2 bg-slate-800/80 hover:bg-slate-700/80 rounded-lg transition-colors border border-slate-700/50 backdrop-blur-sm"
-          >
-            Logout
-          </button>
+          <div className="flex gap-4">
+            {isAdmin && (
+              <a 
+                href="/admin"
+                className="px-4 py-2 bg-rose-600/20 text-rose-400 hover:bg-rose-600/30 rounded-lg transition-colors border border-rose-500/20 backdrop-blur-sm"
+              >
+                Admin Panel
+              </a>
+            )}
+            <button 
+              onClick={logout}
+              className="px-4 py-2 bg-slate-800/80 hover:bg-slate-700/80 rounded-lg transition-colors border border-slate-700/50 backdrop-blur-sm"
+            >
+              Logout
+            </button>
+          </div>
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

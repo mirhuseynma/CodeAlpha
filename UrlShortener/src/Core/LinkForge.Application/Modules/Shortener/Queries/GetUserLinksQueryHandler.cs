@@ -29,7 +29,8 @@ public class GetUserLinksQueryHandler : IRequestHandler<GetUserLinksQuery, Paged
                 x.OriginalUrl, 
                 x.CustomAlias, 
                 x.CreatedAt,
-                x.Visits.Count()
+                x.Visits.Count(),
+                x.IsActive
             ));
 
         return await PagedResult<ShortLinkResponseDto>.CreateAsync(query, request.PageNumber, request.PageSize, cancellationToken);

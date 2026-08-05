@@ -62,4 +62,27 @@ public class LinksController : ApiControllerBase
         
         return NoContent();
     }
+
+    [HttpPatch("{id:guid}/status")]
+    public async Task<IActionResult> ToggleStatus(Guid id, [FromBody] ToggleStatusRequest request, CancellationToken cancellationToken)
+    {
+        var command = new ToggleLinkStatusCommand(id, request.IsActive);
+        await _mediator.Send(command, cancellationToken);
+        
+        return NoContent();
+    }
+
+    [HttpGet("{id:guid}/analytics")]
+    public async Task<IActionResult> GetAnalytics(Guid id, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
+    {
+        var query = new GetLinkAnalyticsQuery(id, pageNumber, pageSize);
+        var result = await _mediator.Send(query, cancellationToken);
+        
+        return Ok(result);
+    }
+}
+
+public class ToggleStatusRequest
+{
+    public bool IsActive { get; set; }
 }
