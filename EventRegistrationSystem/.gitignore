@@ -1,0 +1,78 @@
+# =========================
+# AI / Agent Settings
+# =========================
+.agents/
+.gemini/
+learning_proposal.md
+
+# =========================
+# .NET / C# Backend
+# =========================
+## Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+## Visual Studio
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+
+## Rider / JetBrains
+.idea/
+*.sln.iml
+
+## Configuration and Secrets (As per Codex Rules)
+.env
+.env.*
+!.env.example
+appsettings.Local.json
+appsettings.Development.Local.json
+
+# =========================
+# Frontend / Node.js
+# =========================
+node_modules/
+dist/
+build/
+.next/
+out/
+.nuxt/
+coverage/
+.cache/
+
+# Environment variables (Frontend)
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# npm/yarn/pnpm debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =========================
+# OS generated files
+# =========================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
