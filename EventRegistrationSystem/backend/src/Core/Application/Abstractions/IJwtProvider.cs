@@ -1,4 +1,3 @@
-using EventRegistrationSystem.Domain.Entities;
 
 namespace EventRegistrationSystem.Application.Abstractions;
 

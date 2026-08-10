@@ -1,8 +1,6 @@
-using System.Text;
-using EventRegistrationSystem.Application.Abstractions;
-using EventRegistrationSystem.Infrastructure.Authentication;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 
 namespace EventRegistrationSystem.Infrastructure.Extensions;
 
@@ -10,7 +8,7 @@ public static class InfrastructureServiceRegistration
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddScoped<IJwtProvider, JwtProvider>();
+        services.AddScoped<IJwtProvider, EventRegistrationSystem.Infrastructure.Authentication.JwtProvider>();
 
         var secretKey = configuration["JWT_SECRET"]!;
         var issuer = configuration["JWT_ISSUER"]!;
@@ -18,17 +16,18 @@ public static class InfrastructureServiceRegistration
 
         services.AddAuthentication(options =>
         {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultAuthenticateScheme = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme;
         })
         .AddJwtBearer(options =>
         {
-            options.RequireHttpsMetadata = false; // For dev
+            options.RequireHttpsMetadata = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Development";
             options.SaveToken = true;
-            options.TokenValidationParameters = new TokenValidationParameters
+            options.MapInboundClaims = false;
+            options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+                IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(secretKey)),
                 ValidateIssuer = true,
                 ValidIssuer = issuer,
                 ValidateAudience = true,
@@ -38,6 +37,7 @@ public static class InfrastructureServiceRegistration
             };
         });
 
+        services.AddScoped<EventRegistrationSystem.Application.Abstractions.ICurrentUserService, EventRegistrationSystem.Infrastructure.Services.CurrentUserService>();
         return services;
     }
 }

@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Diagnostics;
-
 namespace EventRegistrationSystem.API.Middleware;
 
 public class GlobalExceptionHandlerMiddleware : IExceptionHandler
@@ -31,12 +29,29 @@ public class GlobalExceptionHandlerMiddleware : IExceptionHandler
                 .GroupBy(e => e.PropertyName, e => e.ErrorMessage)
                 .ToDictionary(g => g.Key, g => g.ToArray());
         }
-        else if (exception is Exception ex && (ex.Message.Contains("Invalid") || ex.Message.Contains("failed") || ex.Message.Contains("exists") || ex.Message.Contains("expired")))
+        else if (exception is EventRegistrationSystem.Application.Exceptions.UnauthorizedException unauthorizedException)
         {
-            // Simple generic handling for known business errors for Day 1
+            problemDetails.Status = StatusCodes.Status401Unauthorized;
+            problemDetails.Title = "Unauthorized";
+            problemDetails.Detail = unauthorizedException.Message;
+        }
+        else if (exception is EventRegistrationSystem.Application.Exceptions.ForbiddenException forbiddenException)
+        {
+            problemDetails.Status = StatusCodes.Status403Forbidden;
+            problemDetails.Title = "Forbidden";
+            problemDetails.Detail = forbiddenException.Message;
+        }
+        else if (exception is EventRegistrationSystem.Application.Exceptions.BadRequestException badRequestException)
+        {
             problemDetails.Status = StatusCodes.Status400BadRequest;
             problemDetails.Title = "Bad Request";
-            problemDetails.Detail = ex.Message;
+            problemDetails.Detail = badRequestException.Message;
+        }
+        else if (exception is EventRegistrationSystem.Application.Exceptions.NotFoundException notFoundException)
+        {
+            problemDetails.Status = StatusCodes.Status404NotFound;
+            problemDetails.Title = "Not Found";
+            problemDetails.Detail = notFoundException.Message;
         }
 
         httpContext.Response.StatusCode = problemDetails.Status.Value;
@@ -45,3 +60,5 @@ public class GlobalExceptionHandlerMiddleware : IExceptionHandler
         return true;
     }
 }
+
+

@@ -1,5 +1,3 @@
-using System.Reflection;
-using EventRegistrationSystem.Application.Behaviors;
 
 namespace EventRegistrationSystem.Application.Extensions;
 

@@ -1,10 +1,3 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
-using EventRegistrationSystem.Application.Abstractions;
-using EventRegistrationSystem.Domain.Entities;
-using Microsoft.IdentityModel.Tokens;
 
 namespace EventRegistrationSystem.Infrastructure.Authentication;
 

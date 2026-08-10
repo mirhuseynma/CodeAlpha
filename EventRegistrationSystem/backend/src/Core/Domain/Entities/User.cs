@@ -1,6 +1,7 @@
 namespace EventRegistrationSystem.Domain.Entities;
 
-public class User : IdentityUser<Guid>
+public class User : Microsoft.AspNetCore.Identity.IdentityUser<Guid>
+
 {
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;

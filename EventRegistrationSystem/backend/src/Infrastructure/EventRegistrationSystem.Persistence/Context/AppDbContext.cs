@@ -1,10 +1,10 @@
-using EventRegistrationSystem.Application.Abstractions;
-using EventRegistrationSystem.Domain.Entities;
 
 namespace EventRegistrationSystem.Persistence.Context;
 
 public class AppDbContext : IdentityDbContext<User, Role, Guid>, IAppDbContext
 {
+    public DbSet<Event> Events { get; set; }
+
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
     }
@@ -17,8 +17,15 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid>, IAppDbContext
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+
+        builder.Entity<Event>()
+            .HasOne(e => e.Organizer)
+            .WithMany()
+            .HasForeignKey(e => e.OrganizerId)
+            .IsRequired();
         
         // Apply configurations from assembly if any
         builder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
     }
 }
+
