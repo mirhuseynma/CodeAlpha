@@ -7,3 +7,7 @@ global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Configuration;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+global using EventRegistrationSystem.Application.Abstractions;
+global using EventRegistrationSystem.Domain.Entities;
+global using Microsoft.AspNetCore.Identity;
+global using EventRegistrationSystem.Persistence.Context;

@@ -1,16 +1,11 @@
-using EventRegistrationSystem.Application.Features.Auth.DTOs;
-using EventRegistrationSystem.Application.Abstractions;
-using EventRegistrationSystem.Domain.Entities;
-using Microsoft.AspNetCore.Identity;
-
 namespace EventRegistrationSystem.Application.Features.Auth.Commands.Refresh;
 
 public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, AuthResult>
 {
-    private readonly UserManager<User> _userManager;
-    private readonly IJwtProvider _jwtProvider;
+    private readonly Microsoft.AspNetCore.Identity.UserManager<User> _userManager;
+    private readonly EventRegistrationSystem.Application.Abstractions.IJwtProvider _jwtProvider;
 
-    public RefreshTokenCommandHandler(UserManager<User> userManager, IJwtProvider jwtProvider)
+    public RefreshTokenCommandHandler(Microsoft.AspNetCore.Identity.UserManager<User> userManager, EventRegistrationSystem.Application.Abstractions.IJwtProvider jwtProvider)
     {
         _userManager = userManager;
         _jwtProvider = jwtProvider;
@@ -18,16 +13,11 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, A
 
     public async Task<AuthResult> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
-        // For simplicity in this demo, we assume the token is validated inside JwtProvider or similar.
-        // Actually we need to extract claims from expired token. But let's simplify for Day 1 and just find user by token (if stored) or pass the user ID inside the refresh request.
-        // Wait, standard way is to read the expired token. But we don't have access to token validation here easily without injecting it.
-        // Instead, let's just use the RefreshToken to find the user.
-        
-        var user = _userManager.Users.FirstOrDefault(u => u.RefreshToken == request.RefreshToken);
+        var user = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.FirstOrDefaultAsync(_userManager.Users, u => u.RefreshToken == request.RefreshToken, cancellationToken);
         
         if (user == null || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
         {
-            throw new Exception("Invalid or expired refresh token."); // Custom exception
+            throw new EventRegistrationSystem.Application.Exceptions.BadRequestException("Invalid or expired refresh token."); // Custom exception
         }
 
         var roles = await _userManager.GetRolesAsync(user);
@@ -38,6 +28,6 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, A
         user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
         await _userManager.UpdateAsync(user);
 
-        return new AuthResult(user.Id, user.Email, newToken, newRefreshToken);
+        return new AuthResult(newToken, newRefreshToken);
     }
 }

@@ -1,38 +1,48 @@
-using EventRegistrationSystem.Application.Features.Auth.Commands.Login;
-using EventRegistrationSystem.Application.Features.Auth.Commands.Refresh;
-using EventRegistrationSystem.Application.Features.Auth.Commands.Register;
 
 namespace EventRegistrationSystem.API.Controllers;
 
-[Route("api/[controller]")]
 [ApiController]
+[Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly ISender _sender;
+    private readonly IMediator _mediator;
 
-    public AuthController(ISender sender)
+    public AuthController(IMediator mediator)
     {
-        _sender = sender;
+        _mediator = mediator;
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register(RegisterCommand command)
+    public async Task<ActionResult<RegisterResult>> Register([FromBody] RegisterCommand command)
     {
-        var result = await _sender.Send(command);
+        var result = await _mediator.Send(command);
         return Ok(result);
     }
 
-    [HttpPost("login")]
-    public async Task<IActionResult> Login(LoginCommand command)
+    [HttpPost("confirm-email")]
+    public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailCommand command)
     {
-        var result = await _sender.Send(command);
+        var result = await _mediator.Send(command);
+        
+        if (result)
+        {
+            return Ok(new { Message = "Email successfully confirmed. You can now login." });
+        }
+        
+        return BadRequest(new { Message = "Failed to confirm email." });
+    }
+
+    [HttpPost("login")]
+    public async Task<ActionResult<AuthResult>> Login([FromBody] LoginCommand command)
+    {
+        var result = await _mediator.Send(command);
         return Ok(result);
     }
 
     [HttpPost("refresh")]
-    public async Task<IActionResult> Refresh(RefreshTokenCommand command)
+    public async Task<ActionResult<AuthResult>> Refresh([FromBody] RefreshTokenCommand command)
     {
-        var result = await _sender.Send(command);
+        var result = await _mediator.Send(command);
         return Ok(result);
     }
 }

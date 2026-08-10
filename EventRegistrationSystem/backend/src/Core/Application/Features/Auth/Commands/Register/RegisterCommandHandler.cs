@@ -1,27 +1,22 @@
-using EventRegistrationSystem.Application.Features.Auth.DTOs;
-using EventRegistrationSystem.Application.Abstractions;
-using EventRegistrationSystem.Domain.Entities;
-using Microsoft.AspNetCore.Identity;
-
 namespace EventRegistrationSystem.Application.Features.Auth.Commands.Register;
 
-public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthResult>
+public class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterResult>
 {
-    private readonly UserManager<User> _userManager;
-    private readonly IJwtProvider _jwtProvider;
+    private readonly Microsoft.AspNetCore.Identity.UserManager<User> _userManager;
+    private readonly Microsoft.AspNetCore.Identity.RoleManager<Role> _roleManager;
 
-    public RegisterCommandHandler(UserManager<User> userManager, IJwtProvider jwtProvider)
+    public RegisterCommandHandler(Microsoft.AspNetCore.Identity.UserManager<User> userManager, Microsoft.AspNetCore.Identity.RoleManager<Role> roleManager)
     {
         _userManager = userManager;
-        _jwtProvider = jwtProvider;
+        _roleManager = roleManager;
     }
 
-    public async Task<AuthResult> Handle(RegisterCommand request, CancellationToken cancellationToken)
+    public async Task<RegisterResult> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
         var existingUser = await _userManager.FindByEmailAsync(request.Email);
         if (existingUser != null)
         {
-            throw new Exception("User with this email already exists."); // TODO: Custom exception
+            throw new EventRegistrationSystem.Application.Exceptions.BadRequestException("User with this email already exists."); // TODO: Custom exception
         }
 
         var user = new User
@@ -29,7 +24,8 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthResul
             UserName = request.Email,
             Email = request.Email,
             FirstName = request.FirstName,
-            LastName = request.LastName
+            LastName = request.LastName,
+            EmailConfirmed = false
         };
 
         var result = await _userManager.CreateAsync(user, request.Password);
@@ -37,17 +33,17 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthResul
         if (!result.Succeeded)
         {
             var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-            throw new Exception($"Registration failed: {errors}"); // TODO: Custom exception
+            throw new EventRegistrationSystem.Application.Exceptions.BadRequestException($"Registration failed: {errors}"); // TODO: Custom exception
         }
 
-        var roles = await _userManager.GetRolesAsync(user);
-        var token = _jwtProvider.GenerateToken(user, roles);
-        
-        var refreshToken = _jwtProvider.GenerateRefreshToken();
-        user.RefreshToken = refreshToken;
-        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
-        await _userManager.UpdateAsync(user);
+        var roleName = "User";
+        if (await _roleManager.RoleExistsAsync(roleName))
+        {
+            await _userManager.AddToRoleAsync(user, roleName);
+        }
 
-        return new AuthResult(user.Id, user.Email, token, refreshToken);
+        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+        return new RegisterResult(user.Id, "Registration successful. Please confirm your email.", token);
     }
 }
