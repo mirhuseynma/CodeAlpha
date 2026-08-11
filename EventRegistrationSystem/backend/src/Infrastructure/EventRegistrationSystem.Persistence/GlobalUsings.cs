@@ -11,3 +11,5 @@ global using EventRegistrationSystem.Application.Abstractions;
 global using EventRegistrationSystem.Domain.Entities;
 global using Microsoft.AspNetCore.Identity;
 global using EventRegistrationSystem.Persistence.Context;
+global using EventRegistrationSystem.Domain.Constants;
+ 

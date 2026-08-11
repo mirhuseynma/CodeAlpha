@@ -27,12 +27,12 @@ public class DeleteEventCommandHandler : IRequestHandler<DeleteEventCommand>
         
         if (existingEvent == null)
         {
-            throw new EventRegistrationSystem.Application.Exceptions.NotFoundException("Event not found.");
+            throw new EventRegistrationSystem.Application.Exceptions.EventNotFoundException(request.Id);
         }
 
         if (!isUserAdmin && existingEvent.OrganizerId != userId)
         {
-            throw new EventRegistrationSystem.Application.Exceptions.ForbiddenException("You do not have permission to delete this event because you are not the organizer.");
+            throw new EventRegistrationSystem.Application.Exceptions.ForbiddenOperationException("You do not have permission to delete this event because you are not the organizer.");
         }
 
         _context.Events.Remove(existingEvent);

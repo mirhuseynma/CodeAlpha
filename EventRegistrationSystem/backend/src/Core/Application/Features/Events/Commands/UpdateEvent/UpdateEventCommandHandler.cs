@@ -27,12 +27,12 @@ public class UpdateEventCommandHandler : IRequestHandler<UpdateEventCommand, Eve
         
         if (existingEvent == null)
         {
-            throw new EventRegistrationSystem.Application.Exceptions.NotFoundException("Event not found.");
+            throw new EventRegistrationSystem.Application.Exceptions.EventNotFoundException(request.Id);
         }
 
         if (!isUserAdmin && existingEvent.OrganizerId != userId)
         {
-            throw new EventRegistrationSystem.Application.Exceptions.ForbiddenException("You do not have permission to update this event because you are not the organizer.");
+            throw new EventRegistrationSystem.Application.Exceptions.ForbiddenOperationException("You do not have permission to update this event because you are not the organizer.");
         }
 
         // Apply changes

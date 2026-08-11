@@ -1,3 +1,5 @@
+using EventRegistrationSystem.Persistence.Services;
+
 namespace EventRegistrationSystem.Persistence.Extensions;
 
 public static class PersistenceServiceRegistration
@@ -11,7 +13,7 @@ public static class PersistenceServiceRegistration
 
         services.AddScoped<IAppDbContext>(provider => provider.GetRequiredService<AppDbContext>());
 
-        services.AddScoped<IPermissionService, EventRegistrationSystem.Persistence.Services.PermissionService>();
+        services.AddScoped<IPermissionService, PermissionService>();
 
 
         return services;

@@ -18,7 +18,7 @@ public class GetEventByIdQueryHandler : IRequestHandler<GetEventByIdQuery, Event
             
         if (e == null)
         {
-            throw new EventRegistrationSystem.Application.Exceptions.NotFoundException("Event not found.");
+            throw new EventRegistrationSystem.Application.Exceptions.EventNotFoundException(request.Id);
         }
 
         return new EventDto

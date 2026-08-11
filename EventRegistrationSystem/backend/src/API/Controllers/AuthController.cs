@@ -12,14 +12,24 @@ public class AuthController : ControllerBase
         _mediator = mediator;
     }
 
+    /// <summary>
+    /// Registers a new user
+    /// </summary>
     [HttpPost("register")]
+    [ProducesResponseType(typeof(RegisterResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<RegisterResult>> Register([FromBody] RegisterCommand command)
     {
         var result = await _mediator.Send(command);
         return Ok(result);
     }
 
+    /// <summary>
+    /// Confirms a user's email address
+    /// </summary>
     [HttpPost("confirm-email")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailCommand command)
     {
         var result = await _mediator.Send(command);
@@ -32,14 +42,26 @@ public class AuthController : ControllerBase
         return BadRequest(new { Message = "Failed to confirm email." });
     }
 
+    /// <summary>
+    /// Logs in a user
+    /// </summary>
     [HttpPost("login")]
+    [ProducesResponseType(typeof(AuthResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<AuthResult>> Login([FromBody] LoginCommand command)
     {
         var result = await _mediator.Send(command);
         return Ok(result);
     }
 
+    /// <summary>
+    /// Refreshes an expired JWT token using a refresh token
+    /// </summary>
     [HttpPost("refresh")]
+    [ProducesResponseType(typeof(AuthResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<AuthResult>> Refresh([FromBody] RefreshTokenCommand command)
     {
         var result = await _mediator.Send(command);
