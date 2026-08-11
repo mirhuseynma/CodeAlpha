@@ -16,19 +16,19 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResult>
         var user = await _userManager.FindByEmailAsync(request.Email);
         if (user == null)
         {
-            throw new EventRegistrationSystem.Application.Exceptions.BadRequestException("Invalid email or password."); // TODO: Custom exception
+            throw new BadRequestException("Invalid email or password."); // TODO: Custom exception
         }
 
         var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password);
         if (!isPasswordValid)
         {
-            throw new EventRegistrationSystem.Application.Exceptions.BadRequestException("Invalid email or password."); // TODO: Custom exception
+            throw new BadRequestException("Invalid email or password."); // TODO: Custom exception
         }
 
-        if (!await _userManager.IsEmailConfirmedAsync(user))
-        {
-            throw new EventRegistrationSystem.Application.Exceptions.BadRequestException("Email is not confirmed. Please confirm your email before logging in.");
-        }
+        //if (!await _userManager.IsEmailConfirmedAsync(user))
+        //{
+        //    throw new BadRequestException("Email is not confirmed. Please confirm your email before logging in.");
+        //}
 
         var roles = await _userManager.GetRolesAsync(user);
         var token = _jwtProvider.GenerateToken(user, roles);

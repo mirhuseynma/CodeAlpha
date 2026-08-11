@@ -53,6 +53,12 @@ public class GlobalExceptionHandlerMiddleware : IExceptionHandler
             problemDetails.Title = "Not Found";
             problemDetails.Detail = notFoundException.Message;
         }
+        else if (exception is EventRegistrationSystem.Application.Exceptions.ConflictException conflictException)
+        {
+            problemDetails.Status = StatusCodes.Status409Conflict;
+            problemDetails.Title = "Conflict";
+            problemDetails.Detail = conflictException.Message;
+        }
 
         httpContext.Response.StatusCode = problemDetails.Status.Value;
         await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);

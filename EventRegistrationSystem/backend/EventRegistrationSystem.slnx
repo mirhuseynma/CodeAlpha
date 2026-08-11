@@ -14,4 +14,6 @@
     <Project Path="src/Infrastructure/EventRegistrationSystem.Infrastructure/EventRegistrationSystem.Infrastructure.csproj" />
     <Project Path="src/Infrastructure/EventRegistrationSystem.Persistence/EventRegistrationSystem.Persistence.csproj" />
   </Folder>
+  <Project Path="EventRegistrationSystem.API.IntegrationTests/EventRegistrationSystem.API.IntegrationTests.csproj" />
+  <Project Path="EventRegistrationSystem.Application.UnitTests/EventRegistrationSystem.Application.UnitTests.csproj" />
 </Solution>

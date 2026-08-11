@@ -12,6 +12,17 @@ public static class ApiServiceRegistration
         
         services.AddEndpointsApiExplorer();
 
+        services.AddCors(options =>
+        {
+            options.AddPolicy("AllowFrontend",
+                policy =>
+                {
+                    policy.WithOrigins("http://localhost:5173", "http://localhost:3000") // Vite and React default ports
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
+        });
+
         services.AddSwaggerGen(c =>
         {
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -25,6 +36,13 @@ public static class ApiServiceRegistration
             });
 
             c.OperationFilter<SecurityRequirementsOperationFilter>();
+
+            var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+            if (File.Exists(xmlPath))
+            {
+                c.IncludeXmlComments(xmlPath);
+            }
         });
 
         // Setup Identity Core in the API layer where it belongs
@@ -35,7 +53,7 @@ public static class ApiServiceRegistration
             options.Password.RequireNonAlphanumeric = false;
             options.Password.RequireUppercase = false;
             options.Password.RequireLowercase = false;
-            options.SignIn.RequireConfirmedEmail = true;
+            options.SignIn.RequireConfirmedEmail = false; // Disabled for local testing
         })
         .AddRoles<Role>()
         .AddEntityFrameworkStores<AppDbContext>()
@@ -50,7 +68,8 @@ public static class ApiServiceRegistration
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
         var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<EventRegistrationSystem.Persistence.Context.AppDbContext>();
         
-        await DatabaseSeeder.SeedAsync(roleManager, userManager, configuration);
+        await DatabaseSeeder.SeedAsync(roleManager, userManager, configuration, dbContext);
     }
 }

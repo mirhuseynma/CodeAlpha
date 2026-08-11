@@ -1,29 +1,38 @@
+
 namespace EventRegistrationSystem.Persistence.Context;
 
 public static class DatabaseSeeder
 {
-    public static async Task SeedAsync(RoleManager<Role> roleManager, UserManager<User> userManager, IConfiguration configuration)
+    public static async Task SeedAsync(RoleManager<Role> roleManager, UserManager<User> userManager, IConfiguration configuration, AppDbContext context)
     {
         // 1. Seed Roles and Permissions
         var allPermissions = GetAllPermissions().ToArray();
-        
+
         await SeedRoleWithPermissionsAsync(roleManager, "Admin", allPermissions);
 
         await SeedRoleWithPermissionsAsync(roleManager, "Organizer", new[]
         {
-            EventRegistrationSystem.Domain.Constants.Permissions.Events.Create,
-            EventRegistrationSystem.Domain.Constants.Permissions.Events.View,
-            EventRegistrationSystem.Domain.Constants.Permissions.Events.Update,
-            EventRegistrationSystem.Domain.Constants.Permissions.Events.Delete,
-            EventRegistrationSystem.Domain.Constants.Permissions.Events.Register,
-            EventRegistrationSystem.Domain.Constants.Permissions.Organizers.View
+            Permissions.Events.Create,
+            Permissions.Events.View,
+            Permissions.Events.Update,
+            Permissions.Events.Delete,
+            Permissions.Events.Register,
+            Permissions.Organizers.View,
+            Permissions.Registrations.Create,
+            Permissions.Registrations.CancelOwn,
+            Permissions.Registrations.ViewOwn,
+            Permissions.Registrations.ViewEvent
         });
 
         await SeedRoleWithPermissionsAsync(roleManager, "User", new[]
         {
-            EventRegistrationSystem.Domain.Constants.Permissions.Events.View,
-            EventRegistrationSystem.Domain.Constants.Permissions.Events.Register,
-            EventRegistrationSystem.Domain.Constants.Permissions.Organizers.View
+            Permissions.Events.Register,
+            Permissions.Events.View,
+            Permissions.Organizers.View,
+            Permissions.Registrations.Create,
+            Permissions.Registrations.ViewOwn,
+            Permissions.Registrations.CancelOwn
+
         });
 
         // 2. Seed Admin User
@@ -63,10 +72,10 @@ public static class DatabaseSeeder
         // 3. Seed Organizer User
         var organizerEmail = configuration["ORGANIZER_EMAIL"] ?? "organizer@example.com";
         var organizerPassword = configuration["ORGANIZER_PASSWORD"];
-        
+
+        User? organizerUser = await userManager.FindByEmailAsync(organizerEmail);
         if (!string.IsNullOrEmpty(organizerPassword))
         {
-            var organizerUser = await userManager.FindByEmailAsync(organizerEmail);
             if (organizerUser == null)
             {
                 organizerUser = new User
@@ -86,6 +95,8 @@ public static class DatabaseSeeder
             }
         }
     }
+
+        
 
     private static async Task SeedRoleWithPermissionsAsync(RoleManager<Role> roleManager, string roleName, string[] permissions)
     {

@@ -4,15 +4,12 @@ namespace EventRegistrationSystem.Persistence.Context;
 public class AppDbContext : IdentityDbContext<User, Role, Guid>, IAppDbContext
 {
     public DbSet<Event> Events { get; set; }
+    public DbSet<Registration> Registrations { get; set; }
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
     }
 
-    // IdentityDbContext already exposes Users and Roles (as Users and Roles DB sets)
-    // We explicitly implement the interface properties using the underlying DbSets.
-    // However, IdentityDbContext exposes DbSet<User> Users { get; set; } and DbSet<Role> Roles { get; set; }
-    // So we don't need to redeclare them, they satisfy the interface implicitly.
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -23,6 +20,22 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid>, IAppDbContext
             .WithMany()
             .HasForeignKey(e => e.OrganizerId)
             .IsRequired();
+            
+        builder.Entity<Registration>()
+            .HasOne(r => r.Event)
+            .WithMany()
+            .HasForeignKey(r => r.EventId)
+            .OnDelete(DeleteBehavior.Cascade);
+            
+        builder.Entity<Registration>()
+            .HasOne(r => r.User)
+            .WithMany()
+            .HasForeignKey(r => r.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<Registration>()
+            .HasIndex(r => new { r.EventId, r.UserId })
+            .IsUnique();
         
         // Apply configurations from assembly if any
         builder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
