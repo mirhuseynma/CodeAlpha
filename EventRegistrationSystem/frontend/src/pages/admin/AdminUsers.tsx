@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../api';
-import { Trash2, Shield } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 
 interface UserDto {
   id: string;
