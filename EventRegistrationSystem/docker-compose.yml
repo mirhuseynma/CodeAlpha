@@ -6,13 +6,46 @@ services:
     container_name: event_registration_db
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: password
       POSTGRES_DB: EventRegistrationDb
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: event_registration_api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - DATABASE_CONNECTION_STRING=Host=postgres;Port=5432;Database=EventRegistrationDb;Username=postgres;Password=password
+      - JWT_SECRET=super_secret_key_that_is_long_enough_for_hmac_sha256
+      - JWT_ISSUER=EventRegistrationSystem
+      - JWT_AUDIENCE=EventRegistrationSystem
+      - ADMIN_EMAIL=admin@example.com
+      - ADMIN_PASSWORD=Admin123!
+    ports:
+      - "5002:8080"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: event_registration_ui
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:

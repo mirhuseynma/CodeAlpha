@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace EventRegistrationSystem.API.Extensions;
 
 public static class ApiServiceRegistration
@@ -69,6 +71,8 @@ public static class ApiServiceRegistration
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
         var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
         var dbContext = scope.ServiceProvider.GetRequiredService<EventRegistrationSystem.Persistence.Context.AppDbContext>();
+        
+        await dbContext.Database.MigrateAsync();
         
         await DatabaseSeeder.SeedAsync(roleManager, userManager, configuration, dbContext);
     }

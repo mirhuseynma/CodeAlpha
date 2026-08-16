@@ -5,7 +5,6 @@ import { Calendar, LogOut } from 'lucide-react';
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
-  const userRole = localStorage.getItem('role');
 
   const handleLogout = () => {
     localStorage.removeItem('token');
