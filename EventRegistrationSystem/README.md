@@ -84,20 +84,15 @@ EventRegistrationSystem/
 
 ## Environment Variables
 
-### Backend (`.env` or `appsettings.json`)
-```env
-DATABASE_CONNECTION_STRING=Host=localhost;Port=5432;Database=EventRegistrationDb;Username=postgres;Password=password
-JWT_SECRET=super_secret_key_that_is_long_enough_for_hmac_sha256
-JWT_ISSUER=EventRegistrationSystem
-JWT_AUDIENCE=EventRegistrationSystem
-ADMIN_EMAIL=admin@example.com
-ADMIN_PASSWORD=Admin123!
+### Docker (`.env`)
+To ensure security, sensitive credentials are not hardcoded in the codebase.
+Copy the `.env.example` file to a new `.env` file in the root directory:
+
+```bash
+cp .env.example .env
 ```
 
-### Frontend (`frontend/.env` - optional)
-```env
-VITE_API_URL=http://localhost:5002/api
-```
+Then edit the `.env` file to customize your passwords and secrets.
 
 ## How to Run
 
